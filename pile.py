@@ -1,13 +1,29 @@
+#    pile.py
+#    Copyright (C) 2018 Mike Puskar
+#
+#    This program is free software: you can redistribute it and/or modify it under the terms
+#    of the GNU General Public License as published by the Free Software Foundation, either
+#    version 3 of the License, or any later version.
+#
+#    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+#    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#    See the GNU General Public License for more details.
+
 from pathlib import Path
 import pygame
 
 OFFSET = 30
+
 
 class Pile(object):
     def __init__(self, location):
         self.cards = []
         self.location = location
         self.image, self.rect = self._get_empty_image()
+
+    @property
+    def size(self):
+        return len(self.cards)
 
     def add(self, card):
         card.set_location(self.location)
@@ -41,14 +57,11 @@ class Pile(object):
     def pop(self, count=None):
         cards = []
         if count is None:
-            count = self.size()
-        for index in range(min(count, self.size())):
+            count = self.size
+        for index in range(min(count, self.size)):
             cards.append(self.cards.pop(-1))
             cards[-1].flip(face_up=True)
         return cards
-
-    def size(self):
-        return len(self.cards)
 
     def _get_empty_image(self):
         if self.location is None:
@@ -76,14 +89,17 @@ class BuildingPile(Pile):
         self.offset = 0
         self.flip()
 
+    @property
+    def visible(self):
+        return len([x for x in self.cards if x.is_face_up])
+
     def add(self, card):
-        location = (self.location[0], self.location[1] + self.offset)
+        location = (self.location[0], self.location[1] + (OFFSET * self.visible))
         card.set_location(location)
         self.cards.append(card)
-        self.offset += OFFSET
 
     def can_accept(self, moving_pile):
-        if self.size() == 0:
+        if self.size == 0:
             return moving_pile.is_king_high
         my_card = self.cards[-1]
         your_card = moving_pile.cards[0]
@@ -95,7 +111,7 @@ class BuildingPile(Pile):
         return False
 
     def flip(self):
-        if self.size() > 0:
+        if self.size > 0:
             self.cards[-1].flip(face_up=True)
             self.offset += OFFSET
 
@@ -111,14 +127,14 @@ class BuildingPile(Pile):
                         moving_pile.add(self.cards.pop(index))
                     except IndexError:
                         keep_popping = False
-                self.offset -= (OFFSET * moving_pile.size())
+                self.offset -= (OFFSET * moving_pile.size)
                 return moving_pile
 
 
 class FinishedPile(Pile):
     def can_accept(self, moving_pile):
-        if moving_pile.size() == 1:
-            if self.size() == 0:
+        if moving_pile.size == 1:
+            if self.size == 0:
                 return moving_pile.is_ace
             else:
                 my_card = self.cards[-1]

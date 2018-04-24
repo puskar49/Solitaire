@@ -1,3 +1,14 @@
+#    card.py
+#    Copyright (C) 2018 Mike Puskar
+#
+#    This program is free software: you can redistribute it and/or modify it under the terms
+#    of the GNU General Public License as published by the Free Software Foundation, either
+#    version 3 of the License, or any later version.
+#
+#    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+#    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+#    See the GNU General Public License for more details.
+
 from pathlib import Path
 import pygame
 
@@ -16,12 +27,13 @@ class Card(pygame.sprite.Sprite):
         self._is_grabbed = False
         self._mouse_offset = [0, 0]
 
+    @property
+    def is_face_up(self):
+        return self._face_up == 1
+
     def flip(self, face_up=True):
         self._face_up = int(face_up)
         self.update_image()
-
-    def is_face_up(self):
-        return self._face_up == 1
 
     def snap_mouse(self, mouse_pos):
         # todo - prevent card from going off screen
