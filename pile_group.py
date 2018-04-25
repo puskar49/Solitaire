@@ -30,6 +30,9 @@ class PileGroup(object):
             item.draw(surface)
 
     def grab(self, mouse_pos):
+        for entry in self.piles:
+            if entry.contains_pos(mouse_pos):
+                return entry.grab(mouse_pos)
         return None
 
 
@@ -60,12 +63,6 @@ class BuildingPileGroup(PileGroup):
                 else:
                     break
         moving_pile.snap_back()
-
-    def grab(self, mouse_pos):
-        for entry in self.piles:
-            if entry.contains_pos(mouse_pos):
-                return entry.grab(mouse_pos)
-        return None
 
 
 class FinishedPileGroup(PileGroup):
